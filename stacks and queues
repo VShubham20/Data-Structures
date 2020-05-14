@@ -1,0 +1,278 @@
+#include<iostream>
+
+using namespace std;
+
+template<typename t>   // using template to make accessible for every database
+class node
+{
+	public:
+		t data;   // Use to store data part
+		node *pointer;  // Use to store address of node 
+	
+		node(t data)   // constructor to intialise
+		{
+			this->data = data;   // this pointer refers to the address of the object which it is a member
+			pointer = NULL;      // initialising the address of pointer to null
+		}
+};
+
+template<typename t>
+class StacksUsingArrays
+{
+		t *data;      // declaring array as a pointer
+		int size;     // defines size of array-stacks at current time
+		int capacity; // max size of array-stack
+	public:
+		StacksUsingArrays(int totalsize)  // constructor
+		{
+			data = new t[totalsize];     // intialising array
+			capacity = totalsize;
+			size = 0;	
+		}
+		
+		int getSize()          // returns current size of stacks
+		{
+			return size;
+		}
+		
+		bool isEmpty()      // returns whether array is empty or not
+		{
+			return size == 0;
+		}
+	
+		void push(t element)   // enters element into stacks
+		{
+			if(size == capacity)   // checks overflow
+			{
+				t *new_data = new t[2*capacity];     // declaring new array with its capacity
+				for(int i = 0; i < capacity; i++)
+				{
+					new_data[i] = data[i];          //  tranferring old stack into new stack array
+				}
+				capacity *= 2;                      // doubling the capacity
+			}
+			data[size] = element;
+			size++;
+		}
+		
+		t pop()                     // for deleting elements from the stacks
+		{
+			if(isEmpty())           // checks underflow
+			{
+				cout << "underflow";
+				return 0;
+			}
+			t temp;                
+			temp = data[size-1];    // saves top element from stack into temp
+			size--;
+			return temp;
+		}
+};
+
+template<typename t>
+class StacksUsingll
+{
+		int size;          // stores current size of array
+		node<t> *top;      // stores  address of top element
+	public:
+		StacksUsingll()   // constructor
+		{
+			top = NULL;
+			size = 0;
+		}
+		
+		bool isEmpty()     // returns true or false after checking arraysize
+		{
+			return size == 0;	
+		}
+		
+		t top_element()  // returns top element of stack
+		{
+			return top->data;
+		}
+		
+		void push(t element)  // for entering into stacks
+		{
+			node<t> *n = new node<t>(element);  // declares and intialise new node
+			size++;                             // increases size 
+			if(top == NULL)                    // checks for first node
+			{
+				top = n;
+			}
+			n->pointer = top;                // links n's pointer to top, inserts after top
+			top = n;                         // n is now top
+		}
+		
+		t pop()               // for deleting the elements
+		{
+			if(isEmpty())     // checks underflow
+			{
+				cout << "underflow";
+				return 0; 
+			}
+			t temp = top->data;   // storing top element into temp
+			top = top->pointer;   // updating top
+			return temp;
+		}
+};
+
+template<typename t>
+class QueueUsingArrays
+{
+		t *data;          // declaring array as pointer
+		int capacity;
+		int size;
+		int nextIndex;    // for storing value of next Index of array
+		int frontIndex;   // index of front element of queue
+	public:
+		QueueUsingArrays(int totalsize)   // constructor
+		{
+			capacity = totalsize;
+			data = new t[totalsize];
+			size = 0;
+			frontIndex = -1;
+			nextIndex = 0;
+		}
+		t front()       // gives the first element of queue
+		{
+			return data[frontIndex];
+		}
+		 
+		void enqueue(t element)          
+		{	
+			if(size == capacity)
+			{
+				t *new_data = new t[2*capacity];       // if capacity is full then increses capacity twice
+				int j = 0;
+				for(int i = frontIndex; i < capacity; i++)              // loop for copying old data into new data array
+				{
+					new_data[j++] = data[i];
+				}
+				for(int i = 0; i < frontIndex; i++)
+				{
+					new_data[j++] = data[i];
+				}
+				delete []data;   // deleting old data array 
+				data = new_data;   // renaming old data array into new data array
+				frontIndex = 0;
+				nextIndex = capacity;
+				capacity *= 2;    // updating size of capacity
+			}
+			if(frontIndex == -1)
+			{
+				frontIndex = 0;
+			}
+			data[nextIndex] = element;
+			nextIndex = (nextIndex + 1) % capacity;    // for making it circular 
+			size++;
+		}
+		
+		t dequeue()            
+		{
+			if(size == 0)
+			{
+				frontIndex = -1;         
+				nextIndex = 0;
+				cout << "underflow" << endl;     // if queue is empty then it will underflow
+				return 0;
+			}
+			t temp = data[frontIndex];  		// storing in the element to be deleted in the temp 
+			frontIndex = (frontIndex + 1) % capacity;            // increasing frontIndex as previous could be overwritten
+			size--;
+			return temp;
+		}
+};
+
+template<typename t>
+class QueueUsingll
+{
+		node<t> *head;
+		node<t> *tail;
+		int size;
+	public:
+		
+		QueueUsingll()         			// constructor
+		{
+			head = NULL;				// head will pointed to first element
+			tail = NULL;				// tail will pointed to last element
+			size = 0;
+		}
+		
+		int getSize()               // returns size
+		{
+			return size;
+		}
+		
+		bool isEmpty()           // returns bool value for empty
+		{
+			return size == 0;
+		}
+		
+		void enqueue(int element)
+		{
+			node<t> *n =  new node<t>(element);    // creating new node with address is stored into n pointer
+			size++;								// updating size
+			if(head == NULL)     				
+			{
+				head = n;
+				tail = n;
+			}
+			tail->pointer = n; 
+			tail = tail->pointer;
+		}
+		
+		t dequeue()
+		{
+			if(size == 0)
+			{
+				cout << "underflow";			// if queue is empty then it will underflow
+				return 0;
+			}
+			t temp = head->data;   				// if underflow will not there then temp will data of first node
+			head = head->pointer;				// head will move to next pointer
+			size--;
+			return temp;
+		}
+};
+
+int main()
+{
+	/*
+	StacksUsingArrays<int> s(5);
+	s.push(10);
+	cout << s.getSize() << endl;
+	s.push(20);
+	s.push(30);
+	s.push(40);
+	s.push(50);
+	s.push(60);
+	cout << s.pop() << endl;
+	
+	StacksUsingll<int> s2;
+	cout << s2.isEmpty();
+	s2.push(10);
+	s2.push(20);
+	cout << s2.pop() << endl;
+	cout << s2.top_element() <<endl; */
+	
+	QueueUsingArrays<int> q(2);
+	q.enqueue(10);
+	q.enqueue(20);
+	cout << q.front() << endl;
+	q.enqueue(30); 
+	cout << q.front() << endl;
+	cout << q.dequeue() << endl;
+	cout << q.dequeue() << endl;
+	cout << q.dequeue() << endl;
+	cout << q.dequeue() << endl;
+	
+	
+	
+	/*
+	QueueUsingll<int> q2;
+	q2.enqueue(10);
+	q2.enqueue(20);
+	q2.enqueue(30);
+	cout << q2.dequeue() << endl; */
+	
+}
